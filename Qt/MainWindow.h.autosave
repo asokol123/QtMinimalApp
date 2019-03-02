@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 
 #include <QMainWindow>
-// I use precompiled header for STL library
+// I use precompiled headers for STL library
 //#include <memory>
 //---------------------------------------------------------------------------
 

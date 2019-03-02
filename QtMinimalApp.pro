@@ -10,6 +10,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = QtMinimalApp
 TEMPLATE = app
+CONFIG += C++14
+CONFIG += precompile_header
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = stdafx.h
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -24,11 +29,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        Qt/MainWindow.cpp
+    Interface/CentralWidgetHandler.cpp \
+    Qt/MainWindow.cpp \
+    ApplicationGlobals.cpp \
+    ApplicationInterface.cpp \
+    ApplicationLocals.cpp \
+    ApplicationImplementation.cpp \
+    Application.cpp \
+    ExceptionHandler.cpp \
+    main.cpp
+
 
 HEADERS += \
-        Qt/MainWindow.h
+    Interface/CentralWidgetHandler.h \
+    Qt/MainWindow.h \
+    ApplicationGlobals.h \
+    ApplicationInterface.h \
+    ApplicationLocals.h \
+    ApplicationImplementation.h \
+    Application.h \
+    ExceptionHandler.h \
+    stdafx.h
 
 FORMS += \
         CMainWindow.ui
