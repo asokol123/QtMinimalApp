@@ -11,8 +11,8 @@
 
 int main(int argc, char *argv[]) {
   namespace NSApp = NSApplication;
-  QApplication QApp(argc, argv);
   try {
+    QApplication QApp(argc, argv);
     NSApp::CApplication Application;
     QApp.exec();
   } catch(std::exception& Exception) {
