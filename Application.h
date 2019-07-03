@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 
 // I use precompiled headers for STL library
-//#include <memory>
+#include <memory> // pch
 //---------------------------------------------------------------------------
 
 namespace NSApplication {

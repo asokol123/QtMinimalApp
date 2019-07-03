@@ -3,10 +3,9 @@
 //---------------------------------------------------------------------------
 // Include
 //---------------------------------------------------------------------------
-
-#include <QMainWindow>
 // I use precompiled header for STL library
-//#include <memory>
+#include <memory> // pch
+#include <QMainWindow>
 //---------------------------------------------------------------------------
 
 namespace Ui {
