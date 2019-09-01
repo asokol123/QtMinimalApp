@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 #include "Qt/MainWindow.h"
+#include "cx11keylogger.h"
 //---------------------------------------------------------------------------
 
 namespace NSApplication {
@@ -31,6 +32,7 @@ class CApplicationGlobals : protected NSQt::CMainWindow {
   using CBase = NSQt::CMainWindow;
 public:
   CApplicationGlobals();
+  std::unique_ptr<CX11Keylogger> X11Keylogger;
 };
 //---------------------------------------------------------------------------
 } // NSApplication

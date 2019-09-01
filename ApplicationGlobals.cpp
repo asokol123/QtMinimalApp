@@ -10,9 +10,11 @@ namespace NSApplication {
 // CApplicationGlobals Definition
 //---------------------------------------------------------------------------
 
-CApplicationGlobals::CApplicationGlobals() {
-
+CApplicationGlobals::CApplicationGlobals()
+    : X11Keylogger(new CX11Keylogger)
+{
 }
+
 //---------------------------------------------------------------------------
 } // NSApplication
 //---------------------------------------------------------------------------

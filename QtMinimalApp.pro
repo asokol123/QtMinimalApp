@@ -37,6 +37,8 @@ SOURCES += \
     ApplicationImplementation.cpp \
     Application.cpp \
     ExceptionHandler.cpp \
+    cx11keyloggerworker.cpp \
+    cx11keylogger.cpp \
     main.cpp
 
 
@@ -49,7 +51,12 @@ HEADERS += \
     ApplicationImplementation.h \
     Application.h \
     ExceptionHandler.h \
+    cx11keyloggerworker.h \
+    cx11keylogger.h \
     stdafx.h
 
 FORMS += \
         CMainWindow.ui
+
+LIBS += -lX11 \
+        -lXi
