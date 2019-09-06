@@ -1,6 +1,7 @@
 #include "cx11keyloggerworker.h"
 #include <exception>
 #include <iostream> // cout to show that everething works
+#include <vector>
 
 CX11KeyloggerWorker::CX11KeyloggerWorker(QThread* myThread, QObject *parent)
     : QObject(parent)
